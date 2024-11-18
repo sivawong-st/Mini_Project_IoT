@@ -1,0 +1,901 @@
+[
+    {
+        "id": "8cb5b253c25e4f43",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "a1def1b71cea7cb9",
+        "type": "http in",
+        "z": "8cb5b253c25e4f43",
+        "name": "หน้าเริ่มต้น",
+        "url": "/product",
+        "method": "get",
+        "upload": true,
+        "swaggerDoc": "",
+        "x": 380,
+        "y": 80,
+        "wires": [
+            [
+                "4cf39173a70d8bc2"
+            ]
+        ]
+    },
+    {
+        "id": "2ee81d35aa40f33a",
+        "type": "http response",
+        "z": "8cb5b253c25e4f43",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1110,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "4cf39173a70d8bc2",
+        "type": "function",
+        "z": "8cb5b253c25e4f43",
+        "name": "ดึงข้อมูลทั้งหมด",
+        "func": "msg.topic = \"SELECT * FROM products \"\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 580,
+        "y": 80,
+        "wires": [
+            [
+                "2a8b1a9e6134a0d2"
+            ]
+        ]
+    },
+    {
+        "id": "cc351e700b92ee46",
+        "type": "template",
+        "z": "8cb5b253c25e4f43",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<!DOCTYPE html>\n<html lang=\"th\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>รายการสินค้า</title>\n    <style>\n        body {\n            font-family: 'Prompt', sans-serif;\n            background-color: #f3f4f6;\n            margin: 0;\n            padding: 20px;\n            color: #444;\n        }\n        h1 {\n            color: #444;\n            text-align: center;\n        }\n        table {\n            width: 100%;\n            border-collapse: collapse;\n            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);\n            background-color: #fff;\n            margin: 20px 0;\n        }\n        th, td {\n            border: 1px solid #ddd;\n            padding: 12px;\n            text-align: left;\n        }\n        th {\n            background-color: #31a84c;\n            color: white;\n            text-transform: uppercase;\n        }\n        tr:nth-child(even) {\n            background-color: #f9f9f9;\n        }\n        tr:hover {\n            background-color: #f1f1f1;\n            transition: background-color 0.2s;\n        }\n        button {\n            background-color: #4CAF50;\n            color: white;\n            border: none;\n            padding: 10px 15px;\n            cursor: pointer;\n            border-radius: 5px;\n            font-size: 14px;\n            transition: background-color 0.3s;\n        }\n        button:hover {\n            background-color: #41693d;\n        }\n        button.delete{\n            background-color: red;\n        }\n        button.delete:hover{\n            background-color: brown;\n        }\n        .form-container {\n            display: flex;\n            gap: 10px;\n            justify-content: center;\n            margin-bottom: 20px;\n        }\n        .form-container form {\n            display: inline-block;\n        }\n    </style>\n</head>\n<body>\n    <h1>รายการสินค้า</h1>\n    <div class=\"form-container\">\n        <form action=\"/page-add-product\" method=\"post\" class=\"add-product-form\">\n            <button type=\"submit\">เพิ่มสินค้า</button>\n        </form>\n        <form action=\"/page-delete-product\" method=\"post\" class=\"add-product-form\">\n            <button type=\"submit\" class=\"delete\">ลบสินค้า</button>\n        </form>\n    </div>\n    <table id=\"productTable\">\n        <tr>\n            <th>ชื่อสินค้า</th>\n            <th>จำนวน</th>\n            <th>ดำเนินการแก้ไข</th>\n            <th>ดำเนินการนับ</th>\n        </tr>\n        {{#payload}}\n        <tr>\n            <td>{{product_name}}</td>\n            <td>{{quantity}}</td>\n            <td>\n                <form action=\"/page-edite-products\" method=\"post\" class=\"edit-product-form\">\n                    <input type=\"hidden\" name=\"product_id\" value=\"{{id}}\"> <!-- ส่ง ID ของสินค้า -->\n                    <button type=\"submit\">แก้ไขสินค้า</button>\n                </form>\n            </td>\n            <td>\n                <form action=\"/process-selected-products\" method=\"get\" class=\"edit-product-form\">\n                    <input type=\"hidden\" name=\"product_id\" value=\"{{id}}\"> <!-- ส่ง ID ของสินค้า -->\n                    <button type=\"submit\">นับสินค้า</button>\n                </form>\n            </td>\n        </tr>\n        {{/payload}}\n    </table>\n</body>\n</html>\n",
+        "output": "str",
+        "x": 960,
+        "y": 80,
+        "wires": [
+            [
+                "2ee81d35aa40f33a"
+            ]
+        ]
+    },
+    {
+        "id": "d45fbc7f198f0632",
+        "type": "template",
+        "z": "8cb5b253c25e4f43",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<!DOCTYPE html>\n<html lang=\"th\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>เพิ่มสินค้า</title>\n    <style>\n        body {\n            font-family: 'Prompt', sans-serif;\n            background-color: #f3f4f6;\n            margin: 0;\n            padding: 20px;\n            color: #333;\n            display: flex;\n            flex-direction: column;\n            align-items: center;\n        }\n        h2 {\n            color: #444;\n        }\n        form {\n            background-color: #fff;\n            padding: 20px;\n            border-radius: 10px;\n            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);\n            width: 100%;\n            max-width: 400px;\n            margin-bottom: 20px;\n        }\n        input[type=\"text\"], input[type=\"number\"] {\n            width: calc(100% - 20px);\n            padding: 10px;\n            margin-bottom: 15px;\n            border: 1px solid #ddd;\n            border-radius: 5px;\n            box-sizing: border-box;\n            font-size: 14px;\n        }\n        button {\n            background-color: #4CAF50;\n            color: white;\n            border: none;\n            padding: 10px 15px;\n            cursor: pointer;\n            border-radius: 5px;\n            font-size: 14px;\n            width: 100%;\n            transition: background-color 0.3s;\n        }\n        button:hover {\n            background-color: #45a049;\n        }\n    </style>\n</head>\n<body>\n    <form action=\"/product\" method=\"get\" class=\"add-product-form\">\n    <button type=\"submit\">หน้าสินค้า</button>\n    </form>\n    <form action=\"/add-product\" method=\"post\" class=\"add-product-form\">\n    <h2>เพิ่มสินค้า</h2>\n    <label>ชื่อสินค้า : </label>\n    <input type=\"text\" name=\"product_name\" placeholder=\"ชื่อสินค้า\" required>\n    <label>จำนวนสินค้า : </label>\n    <input type=\"number\" name=\"quantity\" placeholder=\"จำนวน\" required min=\"1\">\n    <button type=\"submit\">เพิ่มสินค้า</button>\n</form>\n\n</body>\n</html>\n",
+        "output": "str",
+        "x": 940,
+        "y": 160,
+        "wires": [
+            [
+                "e87e67e3a2127488"
+            ]
+        ]
+    },
+    {
+        "id": "e87e67e3a2127488",
+        "type": "http response",
+        "z": "8cb5b253c25e4f43",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1110,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "cbbd39c415442d5e",
+        "type": "function",
+        "z": "8cb5b253c25e4f43",
+        "name": "function 3",
+        "func": "// รับข้อมูลสินค้าที่ส่งมาจากโหนดอื่น\nconst product = msg.payload; // คาดว่าข้อมูลมาจาก msg.payload\n\n// สร้างคำสั่ง SQL สำหรับการเพิ่มข้อมูล\nmsg.topic = `INSERT INTO products (product_name, quantity) VALUES ('${product.product_name}', ${product.quantity});`;\n\n// ส่งข้อมูล msg ไปยังโหนดถัดไป\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 560,
+        "y": 220,
+        "wires": [
+            [
+                "1d3597e4379480d4"
+            ]
+        ]
+    },
+    {
+        "id": "2a8b1a9e6134a0d2",
+        "type": "mysql",
+        "z": "8cb5b253c25e4f43",
+        "mydb": "8348770a18ca607a",
+        "name": "",
+        "x": 770,
+        "y": 80,
+        "wires": [
+            [
+                "cc351e700b92ee46"
+            ]
+        ]
+    },
+    {
+        "id": "1d3597e4379480d4",
+        "type": "mysql",
+        "z": "8cb5b253c25e4f43",
+        "mydb": "8348770a18ca607a",
+        "name": "",
+        "x": 770,
+        "y": 220,
+        "wires": [
+            [
+                "d45fbc7f198f0632"
+            ]
+        ]
+    },
+    {
+        "id": "f746c62006af11c4",
+        "type": "function",
+        "z": "8cb5b253c25e4f43",
+        "name": "ดึงข้อมูลทั้งหมด",
+        "func": "msg.topic = \"SELECT * FROM products \"\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 580,
+        "y": 300,
+        "wires": [
+            [
+                "30f47a2902031228"
+            ]
+        ]
+    },
+    {
+        "id": "30f47a2902031228",
+        "type": "mysql",
+        "z": "8cb5b253c25e4f43",
+        "mydb": "8348770a18ca607a",
+        "name": "",
+        "x": 770,
+        "y": 300,
+        "wires": [
+            [
+                "b5b0c9e2e002194d"
+            ]
+        ]
+    },
+    {
+        "id": "0123b8ea2032fd8e",
+        "type": "http in",
+        "z": "8cb5b253c25e4f43",
+        "name": "หน้าลบสินค้า",
+        "url": "/page-delete-product",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 390,
+        "y": 300,
+        "wires": [
+            [
+                "f746c62006af11c4"
+            ]
+        ]
+    },
+    {
+        "id": "b5b0c9e2e002194d",
+        "type": "template",
+        "z": "8cb5b253c25e4f43",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<!DOCTYPE html>\n<html lang=\"th\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>รายการสินค้า</title>\n    <style>\n        body {\n            font-family: 'Prompt', sans-serif;\n            background-color: #f3f4f6;\n            margin: 0;\n            padding: 20px;\n            color: #333;\n        }\n        h1 {\n            text-align: center;\n            color: #444;\n        }\n        table {\n            width: 100%;\n            border-collapse: collapse;\n            margin-top: 20px;\n            background-color: #fff;\n            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);\n        }\n        th, td {\n            border: 1px solid #ddd;\n            padding: 10px;\n            text-align: left;\n        }\n        th {\n            background-color: #4CAF50;\n            color: white;\n        }\n        tr:hover {\n            background-color: #f1f1f1;\n            transition: background-color 0.2s;\n        }\n        form {\n            margin-bottom: 20px;\n            padding: 15px;\n            background-color: #fff;\n            border-radius: 10px;\n            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);\n            max-width: 500px;\n            margin: auto;\n        }\n        label {\n            display: block;\n            margin-bottom: 10px;\n            font-size: 16px;\n        }\n        select {\n            width: 100%;\n            padding: 10px;\n            border-radius: 5px;\n            border: 1px solid #ddd;\n            margin-bottom: 15px;\n            font-size: 14px;\n            box-sizing: border-box;\n        }\n        button {\n            background-color: #4CAF50;\n            color: white;\n            border: none;\n            padding: 10px 15px;\n            cursor: pointer;\n            border-radius: 5px;\n            font-size: 14px;\n            width: 100%;\n            transition: background-color 0.3s;\n        }\n        button:hover {\n            background-color: #45a049;\n        }\n        button.delete{\n            background-color: red;\n        }\n        button.delete:hover{\n            background-color: brown;\n        }\n    </style>\n</head>\n<body>\n    <form action=\"/product\" method=\"get\" class=\"add-product-form\">\n        <button type=\"submit\">หน้าสินค้า</button>\n    </form>\n    \n    <h1>รายการสินค้า</h1>\n    \n    <form action=\"/delete-product\" method=\"post\" id=\"deleteProductForm\" class=\"delete-product-form\">\n        <label for=\"productSelect\">เลือกสินค้าสำหรับลบ:</label>\n        <select id=\"productSelect\" name=\"productId\">\n            <option value=\"\" disabled selected>-- เลือกสินค้า --</option> <!-- ข้อความตัวเลือก -->\n            {{#payload}}\n            <option value=\"{{id}}\">{{product_name}}</option>\n            {{/payload}}\n        </select>\n        <button type=\"submit\" class=\"delete\">ลบสินค้า</button>\n    </form>\n\n</body>\n</html>\n",
+        "output": "str",
+        "x": 940,
+        "y": 300,
+        "wires": [
+            [
+                "f210911804112ef5"
+            ]
+        ]
+    },
+    {
+        "id": "f210911804112ef5",
+        "type": "http response",
+        "z": "8cb5b253c25e4f43",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1110,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "d3a473b06964cabb",
+        "type": "http in",
+        "z": "8cb5b253c25e4f43",
+        "name": "ลบสินค้า",
+        "url": "/delete-product",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 370,
+        "y": 360,
+        "wires": [
+            [
+                "fa8d962cc4e87e9e"
+            ]
+        ]
+    },
+    {
+        "id": "fa8d962cc4e87e9e",
+        "type": "function",
+        "z": "8cb5b253c25e4f43",
+        "name": "function 4",
+        "func": "// รับข้อมูลสินค้าที่ส่งมาจากโหนดอื่น\nconst product = msg.payload; // คาดว่าข้อมูลมาจาก msg.payload\n\n// สร้างคำสั่ง SQL สำหรับการลบข้อมูล\nmsg.topic = `DELETE FROM products WHERE id = ${product.productId};`;\n\n// ส่งข้อมูล msg ไปยังโหนดถัดไป\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 560,
+        "y": 360,
+        "wires": [
+            [
+                "b834194a4cb32903"
+            ]
+        ]
+    },
+    {
+        "id": "35cb7521f22337e7",
+        "type": "http in",
+        "z": "8cb5b253c25e4f43",
+        "name": "เพิ่มสินค้า",
+        "url": "/add-product",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 380,
+        "y": 220,
+        "wires": [
+            [
+                "cbbd39c415442d5e"
+            ]
+        ]
+    },
+    {
+        "id": "f20d6f36e47fd067",
+        "type": "http in",
+        "z": "8cb5b253c25e4f43",
+        "name": "หน้าเพิ่มสินค้า",
+        "url": "/page-add-product",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 390,
+        "y": 160,
+        "wires": [
+            [
+                "d45fbc7f198f0632"
+            ]
+        ]
+    },
+    {
+        "id": "b834194a4cb32903",
+        "type": "mysql",
+        "z": "8cb5b253c25e4f43",
+        "mydb": "8348770a18ca607a",
+        "name": "",
+        "x": 770,
+        "y": 360,
+        "wires": [
+            [
+                "f746c62006af11c4"
+            ]
+        ]
+    },
+    {
+        "id": "7e39fa85787afbc3",
+        "type": "http in",
+        "z": "8cb5b253c25e4f43",
+        "name": "หน้าแก้ไขสินค้า",
+        "url": "/page-edite-products",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 390,
+        "y": 440,
+        "wires": [
+            [
+                "5f370aafb5f92ad4"
+            ]
+        ]
+    },
+    {
+        "id": "5f370aafb5f92ad4",
+        "type": "function",
+        "z": "8cb5b253c25e4f43",
+        "name": "ดึงข้อมูลตามที่เลือก",
+        "func": "// สมมติว่า product_id ถูกส่งมาจาก payload\nlet productId = msg.payload.product_id; // ดึง product_id จาก payload\n\n// สร้างข้อความ SQL สำหรับดึงข้อมูลโดยใช้ product_id\nmsg.topic = `SELECT * FROM products WHERE id = ${productId}`;\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 590,
+        "y": 440,
+        "wires": [
+            [
+                "071878d209b7b459"
+            ]
+        ]
+    },
+    {
+        "id": "071878d209b7b459",
+        "type": "mysql",
+        "z": "8cb5b253c25e4f43",
+        "mydb": "8348770a18ca607a",
+        "name": "",
+        "x": 770,
+        "y": 440,
+        "wires": [
+            [
+                "dd56e7b9a37401fa"
+            ]
+        ]
+    },
+    {
+        "id": "d691e73624a6bcec",
+        "type": "template",
+        "z": "8cb5b253c25e4f43",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<!DOCTYPE html>\n<html lang=\"th\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>แก้ไขสินค้า</title>\n    <style>\n        body {\n            font-family: 'Prompt', sans-serif;\n            background-color: #f3f4f6;\n            margin: 0;\n            padding: 20px;\n            display: flex;\n            flex-direction: column;\n            align-items: center;\n            color: #333;\n        }\n        form {\n            background-color: #fff;\n            padding: 20px;\n            border-radius: 10px;\n            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);\n            max-width: 400px;\n            width: 100%;\n            margin-bottom: 20px;\n        }\n        h2 {\n            color: #444;\n            text-align: center;\n        }\n        label {\n            display: block;\n            margin-bottom: 5px;\n            font-size: 16px;\n        }\n        input[type=\"text\"], input[type=\"number\"] {\n            width: calc(100% - 20px);\n            padding: 10px;\n            margin-bottom: 15px;\n            border: 1px solid #ddd;\n            border-radius: 5px;\n            box-sizing: border-box;\n            font-size: 14px;\n        }\n        span {\n            display: block;\n            font-size: 14px;\n            margin-bottom: 10px;\n            color: #555;\n        }\n        button {\n            background-color: #4CAF50;\n            color: white;\n            border: none;\n            padding: 10px 15px;\n            cursor: pointer;\n            border-radius: 5px;\n            font-size: 14px;\n            width: 100%;\n            transition: background-color 0.3s;\n        }\n        button:hover {\n            background-color: #45a049;\n        }\n    </style>\n</head>\n<body>\n    <form action=\"/product\" method=\"get\" class=\"view-product-form\">\n        <button type=\"submit\">หน้าสินค้า</button>\n    </form>\n    \n    <form action=\"/edit-product\" method=\"post\" class=\"edit-product-form\">\n        <h2>แก้ไขสินค้า</h2>\n        \n        <!-- แสดง product_id ที่ไม่สามารถแก้ไขได้ -->\n        <div>\n            <label for=\"product_id\">รหัสสินค้า:</label>\n            <span id=\"product_id\">{{payload.id}}</span> <!-- ใช้ payload.id -->\n            <!-- ซ่อน product_id สำหรับการแก้ไข -->\n            <input type=\"hidden\" name=\"product_id\" value=\"{{payload.id}}\" required>\n        </div>\n\n        <div>\n            <label for=\"product_name\">ชื่อสินค้า:</label>\n            <input type=\"text\" id=\"product_name\" name=\"product_name\" \n                   value=\"{{payload.product_name}}\" required>\n        </div>\n        \n        <div>\n            <label for=\"quantity\">จำนวน:</label>\n            <input type=\"number\" id=\"quantity\" name=\"quantity\" \n                   value=\"{{payload.quantity}}\" required min=\"1\">\n        </div>\n        \n        <button type=\"submit\">บันทึกการเปลี่ยนแปลง</button>\n    </form>\n</body>\n</html>\n",
+        "output": "str",
+        "x": 1120,
+        "y": 440,
+        "wires": [
+            [
+                "852c819e49450e7e"
+            ]
+        ]
+    },
+    {
+        "id": "852c819e49450e7e",
+        "type": "http response",
+        "z": "8cb5b253c25e4f43",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1270,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "ed5f7effecfa0266",
+        "type": "http in",
+        "z": "8cb5b253c25e4f43",
+        "name": "แก้ไขสินค้า",
+        "url": "/edit-product",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 380,
+        "y": 500,
+        "wires": [
+            [
+                "da7bc4061f0b84d2"
+            ]
+        ]
+    },
+    {
+        "id": "dd56e7b9a37401fa",
+        "type": "function",
+        "z": "8cb5b253c25e4f43",
+        "name": "function 5",
+        "func": "// ใน Function node ก่อน template node\nmsg.payload = {\n    id: msg.payload[0].id, // product_id\n    product_name: msg.payload[0].product_name, // ชื่อสินค้า\n    quantity: msg.payload[0].quantity // จำนวน\n};\n\nreturn msg;\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 960,
+        "y": 440,
+        "wires": [
+            [
+                "d691e73624a6bcec"
+            ]
+        ]
+    },
+    {
+        "id": "da7bc4061f0b84d2",
+        "type": "function",
+        "z": "8cb5b253c25e4f43",
+        "name": "function 6",
+        "func": "// รับข้อมูลสินค้าที่ส่งมาจากโหนดอื่น\nconst product = msg.payload; // คาดว่าข้อมูลมาจาก msg.payload\n\n// สร้างคำสั่ง SQL สำหรับการอัปเดตข้อมูล\nmsg.topic = `UPDATE products SET product_name = '${product.product_name}', quantity = ${product.quantity} WHERE id = ${product.product_id};`;\n\n// ส่งข้อมูล msg ไปยังโหนดถัดไป\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 560,
+        "y": 500,
+        "wires": [
+            [
+                "94d826414f0b66a2"
+            ]
+        ]
+    },
+    {
+        "id": "94d826414f0b66a2",
+        "type": "mysql",
+        "z": "8cb5b253c25e4f43",
+        "mydb": "8348770a18ca607a",
+        "name": "",
+        "x": 950,
+        "y": 500,
+        "wires": [
+            [
+                "d1fa69e1b4ad0a4d"
+            ]
+        ]
+    },
+    {
+        "id": "d1fa69e1b4ad0a4d",
+        "type": "template",
+        "z": "8cb5b253c25e4f43",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<!DOCTYPE html>\n<html lang=\"th\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>ผลลัพธ์การอัปเดต</title>\n    <style>\n        body {\n            font-family: 'Prompt', sans-serif;\n            background-color: #f3f4f6;\n            margin: 0;\n            padding: 20px;\n            display: flex;\n            flex-direction: column;\n            align-items: center;\n            justify-content: center;\n            height: 100vh;\n            color: #333;\n        }\n        h2 {\n            color: #4CAF50;\n            margin-bottom: 10px;\n        }\n        p {\n            font-size: 18px;\n            color: #555;\n            margin-bottom: 20px;\n        }\n        form {\n            display: flex;\n            justify-content: center;\n        }\n        button {\n            background-color: #4CAF50;\n            color: white;\n            border: none;\n            padding: 10px 20px;\n            cursor: pointer;\n            border-radius: 5px;\n            font-size: 16px;\n            transition: background-color 0.3s;\n        }\n        button:hover {\n            background-color: #45a049;\n        }\n    </style>\n</head>\n<body>\n    <h2>ผลลัพธ์การอัปเดต</h2>\n    <p>อัปเดตข้อมูลแล้ว</p>\n    <form action=\"/product\" method=\"get\">\n        <button type=\"submit\">หน้าสินค้า</button>\n    </form>\n</body>\n</html>\n",
+        "output": "str",
+        "x": 1120,
+        "y": 500,
+        "wires": [
+            [
+                "84431690337ab83a"
+            ]
+        ]
+    },
+    {
+        "id": "84431690337ab83a",
+        "type": "http response",
+        "z": "8cb5b253c25e4f43",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1270,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "d391cc4fba0354ef",
+        "type": "http in",
+        "z": "8cb5b253c25e4f43",
+        "name": "หน้านับสินค้า",
+        "url": "/process-selected-products",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 390,
+        "y": 580,
+        "wires": [
+            [
+                "e3ec13a1d178f0af"
+            ]
+        ]
+    },
+    {
+        "id": "e3ec13a1d178f0af",
+        "type": "function",
+        "z": "8cb5b253c25e4f43",
+        "name": "ดึงข้อมูลตามที่เลือก",
+        "func": "// สมมติว่า product_id ถูกส่งมาจาก payload\nlet productId = msg.payload.product_id; // ดึง product_id จาก payload\n\n// สร้างข้อความ SQL สำหรับดึงข้อมูลโดยใช้ product_id\nmsg.topic = `SELECT * FROM products WHERE id = ${productId}`;\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 590,
+        "y": 580,
+        "wires": [
+            [
+                "0927e7767a8af606"
+            ]
+        ]
+    },
+    {
+        "id": "0927e7767a8af606",
+        "type": "mysql",
+        "z": "8cb5b253c25e4f43",
+        "mydb": "8348770a18ca607a",
+        "name": "",
+        "x": 770,
+        "y": 580,
+        "wires": [
+            [
+                "b06f23cfd2836299",
+                "9a13cc61876edc08"
+            ]
+        ]
+    },
+    {
+        "id": "b06f23cfd2836299",
+        "type": "function",
+        "z": "8cb5b253c25e4f43",
+        "name": "function 7",
+        "func": "// ใน Function node ก่อน template node\nmsg.payload = {\n    id: msg.payload[0].id, // product_id\n    product_name: msg.payload[0].product_name, // ชื่อสินค้า\n    quantity: msg.payload[0].quantity // จำนวน\n};\n\nreturn msg;\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 960,
+        "y": 580,
+        "wires": [
+            [
+                "1ccdf0016adadb8f",
+                "4d3f7c11cbc4bd07"
+            ]
+        ]
+    },
+    {
+        "id": "c4bc90f5a4017c69",
+        "type": "http response",
+        "z": "8cb5b253c25e4f43",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1270,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "1ccdf0016adadb8f",
+        "type": "mqtt out",
+        "z": "8cb5b253c25e4f43",
+        "name": "",
+        "topic": "mqtt_in",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "a3396a4b3b87beb3",
+        "x": 1120,
+        "y": 640,
+        "wires": []
+    },
+    {
+        "id": "6528081d673ffd81",
+        "type": "mqtt in",
+        "z": "8cb5b253c25e4f43",
+        "name": "",
+        "topic": "mqtt_out",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "a3396a4b3b87beb3",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 380,
+        "y": 640,
+        "wires": [
+            [
+                "43beccf3e3cee743",
+                "18fa385cf27378b3",
+                "226b6c887d98e7de",
+                "18876bb890a57549",
+                "3c073863f73d1671"
+            ]
+        ]
+    },
+    {
+        "id": "33df1a08b04e2be7",
+        "type": "mysql",
+        "z": "8cb5b253c25e4f43",
+        "mydb": "8348770a18ca607a",
+        "name": "",
+        "x": 770,
+        "y": 640,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "43beccf3e3cee743",
+        "type": "function",
+        "z": "8cb5b253c25e4f43",
+        "name": "function 8",
+        "func": "// รับข้อมูลสินค้าที่ส่งมาจากโหนดอื่น\nconst product = msg.payload; // คาดว่าข้อมูลมาจาก msg.payload\n\n// สร้างคำสั่ง SQL สำหรับการอัปเดตข้อมูล โดยห่อหุ้มค่าสตริงด้วยเครื่องหมายคำพูดเดี่ยว\nmsg.topic = `UPDATE products SET quantity = ${product.quantity} WHERE product_name = '${product.product_name}';`;\n\n// ส่งข้อมูล msg ไปยังโหนดถัดไป\nreturn msg;\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 560,
+        "y": 640,
+        "wires": [
+            [
+                "33df1a08b04e2be7"
+            ]
+        ]
+    },
+    {
+        "id": "d57cef970ffb6d12",
+        "type": "mqtt in",
+        "z": "8cb5b253c25e4f43",
+        "name": "",
+        "topic": "mqtt_count",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "a3396a4b3b87beb3",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 380,
+        "y": 780,
+        "wires": [
+            [
+                "18fa385cf27378b3",
+                "18876bb890a57549",
+                "3c073863f73d1671",
+                "42088a159b6588c2",
+                "226b6c887d98e7de"
+            ]
+        ]
+    },
+    {
+        "id": "4d3f7c11cbc4bd07",
+        "type": "template",
+        "z": "8cb5b253c25e4f43",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<!DOCTYPE html>\n<html lang=\"th\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>ผลลัพธ์การสั่งการ</title>\n    <style>\n        body {\n            font-family: 'Prompt', sans-serif;\n            background-color: #f3f4f6;\n            margin: 0;\n            padding: 20px;\n            display: flex;\n            flex-direction: column;\n            align-items: center;\n            justify-content: center;\n            height: 100vh;\n            color: #333;\n        }\n        h2 {\n            color: #2196F3;\n            margin-bottom: 10px;\n        }\n        p {\n            font-size: 18px;\n            color: #555;\n            margin-bottom: 20px;\n        }\n        form {\n            display: flex;\n            justify-content: center;\n        }\n        button {\n            background-color: #2196F3;\n            color: white;\n            border: none;\n            padding: 10px 20px;\n            cursor: pointer;\n            border-radius: 5px;\n            font-size: 16px;\n            transition: background-color 0.3s;\n        }\n        button:hover {\n            background-color: #1976D2;\n        }\n    </style>\n</head>\n<body>\n    <h2>ผลลัพธ์การสั่งการ</h2>\n    <p>เริ่มทำการนับสินค้าเเล้ว</p>\n    <form action=\"/ui\" method=\"get\">\n        <button type=\"submit\">Dashboard</button>\n    </form>\n</body>\n</html>\n",
+        "output": "str",
+        "x": 1120,
+        "y": 580,
+        "wires": [
+            [
+                "c4bc90f5a4017c69"
+            ]
+        ]
+    },
+    {
+        "id": "18fa385cf27378b3",
+        "type": "ui_text",
+        "z": "8cb5b253c25e4f43",
+        "group": "d7565332e7696412",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "ชื่อสินค้า",
+        "format": "{{msg.payload.product_name}}",
+        "layout": "row-center",
+        "className": "",
+        "style": true,
+        "font": "",
+        "fontSize": "16",
+        "color": "#000000",
+        "x": 620,
+        "y": 720,
+        "wires": []
+    },
+    {
+        "id": "18876bb890a57549",
+        "type": "ui_text",
+        "z": "8cb5b253c25e4f43",
+        "group": "d7565332e7696412",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "จำนวนสินค้า",
+        "format": "{{msg.payload.quantity}}",
+        "layout": "row-center",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 630,
+        "y": 840,
+        "wires": []
+    },
+    {
+        "id": "3c073863f73d1671",
+        "type": "ui_gauge",
+        "z": "8cb5b253c25e4f43",
+        "name": "",
+        "group": "d7565332e7696412",
+        "order": 2,
+        "width": "0",
+        "height": "0",
+        "gtype": "gage",
+        "title": "{{msg.payload.product_name}}",
+        "label": "ชิ้น",
+        "format": "{{msg.payload.quantity}}",
+        "min": 0,
+        "max": "1000",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "diff": false,
+        "className": "",
+        "x": 610,
+        "y": 900,
+        "wires": []
+    },
+    {
+        "id": "42088a159b6588c2",
+        "type": "ui_template",
+        "z": "8cb5b253c25e4f43",
+        "group": "d7565332e7696412",
+        "name": "",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "format": "<div style=\"text-align: center; margin-top: 20px;\">\n    <form action=\"/product\" method=\"get\">\n        <button type=\"submit\" style=\"\n            background-color: #4CAF50; /* สีพื้นหลัง */\n            border: none; /* ไม่มีขอบ */\n            color: white; /* สีตัวอักษร */\n            padding: 15px 32px; /* ขนาดปุ่ม */\n            text-align: center; /* จัดกึ่งกลาง */\n            text-decoration: none; /* ไม่มีขีดเส้นใต้ */\n            display: inline-block; /* ปรับรูปแบบการแสดงผล */\n            font-size: 16px; /* ขนาดตัวอักษร */\n            margin: 4px 2px; /* ระยะห่าง */\n            cursor: pointer; /* เปลี่ยนรูปแบบเมื่อชี้เมาส์ */\n            border-radius: 12px; /* มุมโค้ง */\n            transition: background-color 0.3s; /* เอฟเฟ็กต์การเปลี่ยนสี */\n        \" onmouseover=\"this.style.backgroundColor='#45a049'\" onmouseout=\"this.style.backgroundColor='#4CAF50'\">\n            หน้าสินค้า\n        </button>\n    </form>\n</div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 620,
+        "y": 960,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "226b6c887d98e7de",
+        "type": "ui_text",
+        "z": "8cb5b253c25e4f43",
+        "group": "d7565332e7696412",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "สถานะการนับ",
+        "format": "{{msg.payload.command}}",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#000000",
+        "x": 630,
+        "y": 780,
+        "wires": []
+    },
+    {
+        "id": "9a13cc61876edc08",
+        "type": "function",
+        "z": "8cb5b253c25e4f43",
+        "name": "function 10",
+        "func": "msg.payload = {\n    id: msg.payload[0].id, // product_id\n    product_name: msg.payload[0].product_name, // ชื่อสินค้า\n    quantity: msg.payload[0].quantity, // จำนวน\n    command: \"กำลังนับ\"\n};\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 390,
+        "y": 720,
+        "wires": [
+            [
+                "18fa385cf27378b3",
+                "226b6c887d98e7de",
+                "18876bb890a57549",
+                "3c073863f73d1671"
+            ]
+        ]
+    },
+    {
+        "id": "8348770a18ca607a",
+        "type": "MySQLdatabase",
+        "name": "dbnodered",
+        "host": "127.0.0.1",
+        "port": "3306",
+        "db": "dbnodered",
+        "tz": "",
+        "charset": "UTF8"
+    },
+    {
+        "id": "a3396a4b3b87beb3",
+        "type": "mqtt-broker",
+        "name": "fifatst",
+        "broker": "broker.emqx.io",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "d7565332e7696412",
+        "type": "ui_group",
+        "name": "แสดงผลการนับ",
+        "tab": "4b2f7a13ea1ad76c",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "4b2f7a13ea1ad76c",
+        "type": "ui_tab",
+        "name": "Dashboard",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]
