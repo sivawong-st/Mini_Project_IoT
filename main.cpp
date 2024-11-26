@@ -8,7 +8,7 @@
 #include <ESP8266WiFi.h>
 LiquidCrystal_I2C lcd(0x27,16,2);
 
-#define LINE_TOKEN "b0kOYBnRxXkKhQyxOrpUIU5XbFCbD6jsTZV8GwJJ1ft"
+#define LINE_TOKEN "?"
 
 WiFiClientSecure client;
 HTTPClient http;
