@@ -42,5 +42,5 @@ A system for managing and recording product quantities in inventory.
 
 ## 📚 แหล่งข้อมูลเพิ่มเติม
 
-- [GitHub Repository](https://github.com/sivawong-st/Mini_Project_IoT_Stock_Counting_System)
+- [GitHub Repository](StockCountingSystem.pdf)
 - เอกสารประกอบโครงการ: `StockCountingSystem.pdf`
