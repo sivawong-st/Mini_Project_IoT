@@ -42,5 +42,4 @@ A system for managing and recording product quantities in inventory.
 
 ## 📚 แหล่งข้อมูลเพิ่มเติม
 
-- [GitHub Repository](StockCountingSystem.pdf)
-- เอกสารประกอบโครงการ: `StockCountingSystem.pdf`
+- [เอกสารประกอบโครงการ](StockCountingSystem.pdf)
